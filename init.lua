@@ -1,11 +1,13 @@
-
 -- Set <space> as the leader key
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- KEYMAPS
-require('config.keymaps')
+require 'config.keymaps'
+
+-- PLUGINS
+require 'plugins.oil'
 
 -- ============================================================
 -- SECTION 1: OPTIONS
@@ -207,6 +209,7 @@ do
   vim.pack.add { gh 'folke/tokyonight.nvim' }
   ---@diagnostic disable-next-line: missing-fields
   require('tokyonight').setup {
+    transparent = true,
     styles = {
       comments = { italic = false }, -- Disable italics in comments
     },
@@ -254,6 +257,8 @@ do
   -- - sr)'  - [S]urround [R]eplace [)] [']
   require('mini.surround').setup()
 
+  -- Auto-closing for brackets and single/double-quotes.
+  require('mini.pairs').setup()
   -- Simple and easy statusline.
   --  You could remove this setup call if you don't like it,
   --  and try some other statusline plugin

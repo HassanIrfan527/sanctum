@@ -9,3 +9,8 @@ This neovim config is built for mainly the following frameworks / programming la
 - React / JS / TS
 - Python
 - Go
+
+
+## Plugins
+Here is a list of plugins I have inluded in my neovim config:
+- oil.nvim
