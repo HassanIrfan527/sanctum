@@ -1,0 +1,48 @@
+---@param repo string
+---@return string
+local function gh(repo) return 'https://github.com/' .. repo end
+
+-- [[ mini.nvim ]]
+--  A collection of various small independent plugins/modules
+vim.pack.add { gh 'nvim-mini/mini.nvim' }
+
+-- If a nerd font is available, load the icons module for pretty icons in various plugins.
+if vim.g.have_nerd_font then
+  require('mini.icons').setup()
+  -- Used for backwards compatibility with plugins that require `nvim-web-devicons` (e.g. telescope.nvim)
+  MiniIcons.mock_nvim_web_devicons()
+end
+
+-- Better Around/Inside textobjects
+--
+-- Examples:
+--  - va)  - [V]isually select [A]round [)]paren
+--  - yiiq - [Y]ank [I]nside [I]+1 [Q]uote
+--  - ci'  - [C]hange [I]nside [']quote
+require('mini.ai').setup {
+  -- NOTE: Avoid conflicts with the built-in incremental selection mappings on Neovim>=0.12 (see `:help treesitter-incremental-selection`)
+  mappings = {
+    around_next = 'aa',
+    inside_next = 'ii',
+  },
+  n_lines = 500,
+}
+
+-- Add/delete/replace surroundings (brackets, quotes, etc.)
+--
+-- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+-- - sd'   - [S]urround [D]elete [']quotes
+-- - sr)'  - [S]urround [R]eplace [)] [']
+require('mini.surround').setup()
+
+-- Navigation animation
+require('mini.animate').setup()
+
+-- Auto-closing for brackets and single/double-quotes.
+require('mini.pairs').setup()
+
+-- Plugin for showing open buffers
+require('mini.tabline').setup()
+vim.keymap.set('n', '<leader>n', '<cmd>bnext<CR>', { desc = 'Next buffer' })
+vim.keymap.set('n', '<leader>p', '<cmd>bprevious<CR>', { desc = 'Previous buffer' })
+vim.keymap.set('n', '<leader>x', '<cmd>bdelete<CR>', { desc = 'Close Buffer' })
