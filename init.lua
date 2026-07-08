@@ -7,7 +7,7 @@ vim.g.have_nerd_font = true
 
 -- KEYMAPS & CONFIGS
 require 'config.keymaps'
-require 'config.session'
+
 -- PLUGINS
 require 'plugins.oil'
 require 'plugins.blade'
@@ -481,6 +481,7 @@ do
   ---@type table<string, vim.lsp.Config>
   local servers = {
     pyright = {},
+    intelephense = {}, -- PHP language server (completion, diagnostics, etc.)
     ts_ls = {},
     eslint = {},
     tailwindcss = {
@@ -495,8 +496,6 @@ do
         'php',
       },
     },
-    stylua = {}, -- Used to format Lua code
-
     -- Special Lua Config, as recommended by neovim help docs
     lua_ls = {
       on_init = function(client)
@@ -549,6 +548,7 @@ do
   local ensure_installed = vim.tbl_keys(servers or {})
   vim.list_extend(ensure_installed, {
     -- You can add other tools here that you want Mason to install
+    'stylua', -- Lua formatter
     'pint', -- PHP / Laravel formatter
     'prettierd', -- JS / TS / React / CSS / JSON formatter
     'blade-formatter', -- For Blade formatting
@@ -586,7 +586,9 @@ do
         json = true,
       }
       if enabled_filetypes[vim.bo[bufnr].filetype] then
-        return { timeout_ms = 500 }
+        -- pint (and other PHP formatters) boot a full PHP runtime and can take
+        -- a couple of seconds, especially on the first save, so give them room.
+        return { timeout_ms = 3000 }
       else
         return nil
       end
@@ -659,7 +661,7 @@ do
       -- <c-k>: Toggle signature help
       --
       -- See `:help blink-cmp-config-keymap` for defining your own keymap
-      preset = 'default',
+      preset = 'super-tab',
 
       -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
       --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps

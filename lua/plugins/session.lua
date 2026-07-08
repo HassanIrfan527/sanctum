@@ -13,4 +13,8 @@ require('auto-session').setup {
   -- Don't auto-save/restore in these dirs (home, downloads, root) —
   -- you only want sessions inside actual projects.
   suppressed_dirs = { '~/', '~/Downloads', '/' },
+
+  -- Close transient windows before saving so they aren't restored on launch.
+  -- The location list (<leader>q) and quickfix list are the usual culprits.
+  pre_save_cmds = { 'lclose', 'cclose' },
 }

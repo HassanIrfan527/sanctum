@@ -31,7 +31,7 @@ require('noice').setup {
     view_warn = 'notify',
   },
   lsp = {
-    progress = { enabled = false },
+    progress = { enabled = true },
   },
   presets = {
     long_message_to_split = true,
