@@ -74,3 +74,11 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function() vim.hl.on_yank() end,
 })
+
+-- Keymaps for obsidian.nvim plugin
+-- vim.keymap.set("n", "<leader>os", "<cmd>ObsidianSearch<cr>", { desc = "[O]bsidian [S]earch vault" })
+-- vim.keymap.set("n", "<leader>of", "<cmd>ObsidianQuickSwitch<cr>", { desc = "[O]bsidian [F]ind note" })
+-- vim.keymap.set("n", "<leader>ob", "<cmd>ObsidianBacklinks<cr>", { desc = "[O]bsidian [B]acklinks" })
+-- vim.keymap.set("n", "<leader>od", "<cmd>ObsidianToday<cr>", { desc = "[O]bsidian [D]aily note" })
+-- vim.keymap.set("n", "<leader>on", "<cmd>ObsidianNew<cr>", { desc = "[O]bsidian [N]ew note" })
+-- vim.keymap.set("n", "<leader>ot", "<cmd>ObsidianTags<cr>", { desc = "[O]bsidian [T]ags search" })

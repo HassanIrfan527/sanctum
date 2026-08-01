@@ -2,6 +2,10 @@
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+
+-- Enable 24-bit color
+vim.opt.termguicolors = true
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
@@ -16,7 +20,12 @@ require 'plugins.session'
 require 'plugins.lazydev'
 require 'plugins.lualine'
 require 'plugins.noice'
-
+require 'plugins.codecompanion'
+require 'plugins.colorizer'
+require 'plugins.snacks'
+require 'plugins.markdown'
+require 'plugins.dropbar'
+require 'plugins.obsidian'
 -- ============================================================
 -- SECTION 1: OPTIONS
 -- Core Neovim settings, leaders, options, basic keymaps, basic autocmds
@@ -53,8 +62,6 @@ do
 
   -- Keep signcolumn on by default
   vim.o.signcolumn = 'yes'
-  -- Enable 24-bit color
-  vim.opt.termguicolors = true
   -- Decrease update time
 
   vim.o.updatetime = 250
@@ -202,6 +209,7 @@ do
     spec = {
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
       { '<leader>t', group = '[T]oggle' },
+      { '<leader>a', group = '[A]I (CodeCompanion)', mode = { 'n', 'v' } },
       -- { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
       { 'gr', group = 'LSP Actions', mode = { 'n' } },
     },
@@ -480,7 +488,32 @@ do
   --  See `:help lsp-config` for information about keys and how to configure
   ---@type table<string, vim.lsp.Config>
   local servers = {
-    pyright = {},
+    pyright = {}, -- Python type-checking, completion, hover
+  rust_analyzer = {
+    settings = {
+      ['rust-analyzer'] = {
+        checkOnSave = {
+          command = 'clippy',
+        },
+      },
+    },
+  },
+    ruff = { -- Python linting + auto-fixes (unused imports, style, etc.)
+      -- Let pyright own hover/completion; ruff only lints and fixes,
+      -- so the two don't produce duplicate hover popups.
+      on_attach = function(client) client.server_capabilities.hoverProvider = false end,
+      qmlls = {
+    -- -E tells qmlls to respect system QML2_IMPORT_PATH environments
+    cmd = { 'qmlls', '-E' }, 
+    filetypes = { 'qml', 'qmljs' },
+    -- This helps the LSP find the root of your project
+    root_dir = function(fname)
+      return vim.fs.dirname(vim.fs.find('.git', { path = fname, upward = true })[1])
+    end,
+    single_file_support = true,
+  },
+    },
+    gopls = {}, -- Go language server (Go is listed as a target language)
     intelephense = {}, -- PHP language server (completion, diagnostics, etc.)
     ts_ls = {},
     eslint = {},
@@ -583,6 +616,7 @@ do
         typescript = true,
         typescriptreact = true,
         css = true,
+        qml = true,
         json = true,
       }
       if enabled_filetypes[vim.bo[bufnr].filetype] then
@@ -600,6 +634,7 @@ do
     formatters_by_ft = {
       python = { 'isort', 'black' },
       php = { 'pint' },
+      rust = { 'rustfmt' },
       blade = { 'blade-formatter' },
       javascript = { 'prettierd', 'prettier', stop_after_first = true },
       javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
@@ -611,6 +646,12 @@ do
       jsonc = { 'prettierd', 'prettier', stop_after_first = true },
       yaml = { 'prettierd', 'prettier', stop_after_first = true },
       markdown = { 'prettierd', 'prettier', stop_after_first = true },
+      qml = {'qmlformat-qt6'}
+    },
+
+    formatters = {
+      -- You can also specify extra arguments for formatters here.
+      ['qmlformat-qt6'] = { command = 'qmlformat-qt6', args = { '-i', '$FILENAME' }, stdin = false},
     },
   }
 
@@ -633,8 +674,8 @@ do
   --    See the README about individual language/framework/plugin snippets:
   --    https://github.com/rafamadriz/friendly-snippets
   --
-  -- vim.pack.add { gh 'rafamadriz/friendly-snippets' }
-  -- require('luasnip.loaders.from_vscode').lazy_load()
+  vim.pack.add { gh 'rafamadriz/friendly-snippets' }
+  require('luasnip.loaders.from_vscode').lazy_load()
 
   -- [[ Autocomplete Engine ]]
   vim.pack.add { { src = gh 'saghen/blink.cmp', version = vim.version.range '1.*' } }
@@ -661,7 +702,7 @@ do
       -- <c-k>: Toggle signature help
       --
       -- See `:help blink-cmp-config-keymap` for defining your own keymap
-      preset = 'super-tab',
+      preset = 'default',
 
       -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
       --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -676,11 +717,28 @@ do
     completion = {
       -- By default, you may press `<c-space>` to show the documentation.
       -- Optionally, set `auto_show = true` to show the documentation after a delay.
-      documentation = { auto_show = false, auto_show_delay_ms = 500 },
+      documentation = { auto_show = true, auto_show_delay_ms = 500, window = { border = 'rounded' } },
+
+      menu = {
+        -- Rounded border for the modern, minimal look
+        border = 'rounded',
+        -- A little breathing room around the edges
+        scrollbar = false,
+        draw = {
+          -- Highlight the label text using treesitter for nicer coloring
+          treesitter = { 'lsp' },
+          -- Columns: icon, then label, then the kind text (e.g. "Property") on the right
+          columns = {
+            { 'kind_icon', gap = 1 },
+            { 'label', 'label_description', gap = 1 },
+            { 'kind', gap = 1 },
+          },
+        },
+      },
     },
 
     sources = {
-      default = { 'lsp', 'path', 'snippets' },
+      default = { 'lsp', 'path', 'snippets', 'buffer' },
     },
 
     snippets = { preset = 'luasnip' },
@@ -695,7 +753,7 @@ do
     fuzzy = { implementation = 'lua' },
 
     -- Shows a signature help window while you type arguments for a function
-    signature = { enabled = true },
+    signature = { enabled = true, window = { border = 'rounded' } },
   }
 end
 
@@ -734,8 +792,21 @@ do
     'json',
     'jsonc',
     'yaml',
+    'python', -- was missing despite Python being a target language
+    'go',
+    'gomod',
+    'gowork',
+    'toml',
+    'sql',
+    'dockerfile',
+    'gitcommit',
   }
   require('nvim-treesitter').install(parsers)
+
+  -- Auto-close and auto-rename HTML/JSX/Blade tags (e.g. typing <div> inserts </div>).
+  -- Complements mini.pairs (which handles brackets/quotes, not tags).
+  vim.pack.add { gh 'windwp/nvim-ts-autotag' }
+  require('nvim-ts-autotag').setup {}
 
   ---@param buf integer
   ---@param language string
@@ -808,6 +879,10 @@ do
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   -- require 'custom.plugins'
 end
+
+-- Load last: CodeCompanion depends on plenary + treesitter, which are added by
+-- the `do` blocks above, so it must be required after they've run.
+require 'plugins.codecompanion'
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

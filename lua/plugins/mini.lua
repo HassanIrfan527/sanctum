@@ -35,8 +35,6 @@ require('mini.ai').setup {
 -- - sr)'  - [S]urround [R]eplace [)] [']
 require('mini.surround').setup()
 
--- Navigation animation
-require('mini.animate').setup()
 
 -- Auto-closing for brackets and single/double-quotes.
 require('mini.pairs').setup()
