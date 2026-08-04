@@ -25,7 +25,7 @@ require 'plugins.colorizer'
 require 'plugins.snacks'
 require 'plugins.markdown'
 require 'plugins.dropbar'
-require 'plugins.obsidian'
+-- require 'plugins.obsidian'
 -- ============================================================
 -- SECTION 1: OPTIONS
 -- Core Neovim settings, leaders, options, basic keymaps, basic autocmds
@@ -489,29 +489,27 @@ do
   ---@type table<string, vim.lsp.Config>
   local servers = {
     pyright = {}, -- Python type-checking, completion, hover
-  rust_analyzer = {
-    settings = {
-      ['rust-analyzer'] = {
-        checkOnSave = {
-          command = 'clippy',
+    rust_analyzer = {
+      settings = {
+        ['rust-analyzer'] = {
+          checkOnSave = {
+            command = 'clippy',
+          },
         },
       },
     },
-  },
     ruff = { -- Python linting + auto-fixes (unused imports, style, etc.)
       -- Let pyright own hover/completion; ruff only lints and fixes,
       -- so the two don't produce duplicate hover popups.
       on_attach = function(client) client.server_capabilities.hoverProvider = false end,
       qmlls = {
-    -- -E tells qmlls to respect system QML2_IMPORT_PATH environments
-    cmd = { 'qmlls', '-E' }, 
-    filetypes = { 'qml', 'qmljs' },
-    -- This helps the LSP find the root of your project
-    root_dir = function(fname)
-      return vim.fs.dirname(vim.fs.find('.git', { path = fname, upward = true })[1])
-    end,
-    single_file_support = true,
-  },
+        -- -E tells qmlls to respect system QML2_IMPORT_PATH environments
+        cmd = { 'qmlls', '-E' },
+        filetypes = { 'qml', 'qmljs' },
+        -- This helps the LSP find the root of your project
+        root_dir = function(fname) return vim.fs.dirname(vim.fs.find('.git', { path = fname, upward = true })[1]) end,
+        single_file_support = true,
+      },
     },
     gopls = {}, -- Go language server (Go is listed as a target language)
     intelephense = {}, -- PHP language server (completion, diagnostics, etc.)
@@ -552,6 +550,8 @@ do
           },
         })
       end,
+
+      -- require('lspconfig').nixd.setup {},
       ---@type lspconfig.settings.lua_ls
       settings = {
         Lua = {
@@ -580,11 +580,14 @@ do
   -- You can press `g?` for help in this menu.
   local ensure_installed = vim.tbl_keys(servers or {})
   vim.list_extend(ensure_installed, {
-    -- You can add other tools here that you want Mason to install
     'stylua', -- Lua formatter
     'pint', -- PHP / Laravel formatter
     'prettierd', -- JS / TS / React / CSS / JSON formatter
     'blade-formatter', -- For Blade formatting
+    'html',
+    'cssls',
+    'jsonls',
+    'emmet_ls',
   })
 
   require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -635,6 +638,7 @@ do
       python = { 'isort', 'black' },
       php = { 'pint' },
       rust = { 'rustfmt' },
+      lua = { 'stylua' },
       blade = { 'blade-formatter' },
       javascript = { 'prettierd', 'prettier', stop_after_first = true },
       javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
@@ -646,12 +650,13 @@ do
       jsonc = { 'prettierd', 'prettier', stop_after_first = true },
       yaml = { 'prettierd', 'prettier', stop_after_first = true },
       markdown = { 'prettierd', 'prettier', stop_after_first = true },
-      qml = {'qmlformat-qt6'}
+      qml = { 'qmlformat-qt6' },
+      nix = { 'nixfmt' },
     },
 
     formatters = {
       -- You can also specify extra arguments for formatters here.
-      ['qmlformat-qt6'] = { command = 'qmlformat-qt6', args = { '-i', '$FILENAME' }, stdin = false},
+      ['qmlformat-qt6'] = { command = 'qmlformat-qt6', args = { '-i', '$FILENAME' }, stdin = false },
     },
   }
 
