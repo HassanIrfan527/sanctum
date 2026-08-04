@@ -40,14 +40,16 @@ vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
 vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
+-- Scroll down and up using Alt + j and Alt + k
+vim.keymap.set({ 'n', 'v' }, '<M-j>', '<C-d>zz', { desc = 'Scroll down and center' })
+vim.keymap.set({ 'n', 'v' }, '<M-k>', '<C-u>zz', { desc = 'Scroll up and center' })
+
 -- Keybinds to make split navigation easier.
---  Use LEADER+<hjkl> to switch between windows
---
 --  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<leader>h', '<C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<leader>l', '<C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<leader>j', '<C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<leader>k', '<C-k>', { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', '<leader>h', '<C-w>H', { desc = 'Move window to the left' })
+vim.keymap.set('n', '<leader>l', '<C-w>L', { desc = 'Move window to the right' })
+vim.keymap.set('n', '<leader>j', '<C-w>J', { desc = 'Move window to the lower' })
+vim.keymap.set('n', '<leader>k', '<C-w>K', { desc = 'Move window to the upper' })
 
 -- Split creation:  % = vertical divider,  " = horizontal divider
 vim.keymap.set('n', '<leader>%', '<cmd>vsplit<CR>', { desc = 'Split vertical' })
@@ -57,11 +59,6 @@ vim.keymap.set('n', '<leader>"', '<cmd>split<CR>', { desc = 'Split horizontal' }
 vim.keymap.set('n', '<leader>c', '<cmd>close<CR>', { desc = 'Close window (split)' })
 vim.keymap.set('n', '<leader>C', '<C-w>o', { desc = 'Close other windows' })
 vim.keymap.set('n', '<leader>=', '<C-w>=', { desc = 'Equalize windows' })
--- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
--- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
--- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
--- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
--- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
