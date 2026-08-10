@@ -25,6 +25,7 @@ require 'plugins.colorizer'
 require 'plugins.snacks'
 require 'plugins.markdown'
 require 'plugins.dropbar'
+require 'plugins.alpha'
 -- require 'plugins.obsidian'
 -- ============================================================
 -- SECTION 1: OPTIONS
