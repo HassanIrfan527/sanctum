@@ -72,6 +72,8 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.hl.on_yank() end,
 })
 
+vim.keymap.set('n', '<leader>t', function() require('telescope.builtin').colorscheme { enable_preview = true } end)
+
 -- Keymaps for obsidian.nvim plugin
 -- vim.keymap.set("n", "<leader>os", "<cmd>ObsidianSearch<cr>", { desc = "[O]bsidian [S]earch vault" })
 -- vim.keymap.set("n", "<leader>of", "<cmd>ObsidianQuickSwitch<cr>", { desc = "[O]bsidian [F]ind note" })

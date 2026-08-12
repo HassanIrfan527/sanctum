@@ -3,10 +3,10 @@ vim.pack.add { 'https://github.com/nvim-lualine/lualine.nvim' }
 
 require('lualine').setup {
   options = {
-    theme = 'tokyonight', -- matches my colorscheme
+    theme = 'catppuccin-nvim',
     icons_enabled = vim.g.have_nerd_font,
-    component_separators = '', -- flat, no chevrons — minimal look
+    component_separators = '',
     section_separators = '',
-    globalstatus = true, -- one statusline for all splits, not per-window
+    globalstatus = true,
   },
 }
