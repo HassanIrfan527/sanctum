@@ -454,6 +454,9 @@ do
   --  See `:help lsp-config` for information about keys and how to configure
   ---@type table<string, vim.lsp.Config>
   local servers = {
+    bashls = {
+      filetypes = { 'sh', 'bash', 'zsh' },
+    },
     pyright = {}, -- Python type-checking, completion, hover
     rust_analyzer = {
       settings = {
@@ -464,19 +467,20 @@ do
         },
       },
     },
+    clangd = {
+      cmd = { 'clangd', '--background-index', '--clang-tidy' },
+      settings = {
+        clangd = {
+          fallbackFlags = { '-std=c17' },
+        },
+      },
+    },
     ruff = { -- Python linting + auto-fixes (unused imports, style, etc.)
       -- Let pyright own hover/completion; ruff only lints and fixes,
       -- so the two don't produce duplicate hover popups.
       on_attach = function(client) client.server_capabilities.hoverProvider = false end,
-      qmlls = {
-        -- -E tells qmlls to respect system QML2_IMPORT_PATH environments
-        cmd = { 'qmlls', '-E' },
-        filetypes = { 'qml', 'qmljs' },
-        -- This helps the LSP find the root of your project
-        root_dir = function(fname) return vim.fs.dirname(vim.fs.find('.git', { path = fname, upward = true })[1]) end,
-        single_file_support = true,
-      },
     },
+
     gopls = {}, -- Go language server (Go is listed as a target language)
     intelephense = {}, -- PHP language server (completion, diagnostics, etc.)
     ts_ls = {},
@@ -517,7 +521,6 @@ do
         })
       end,
 
-      -- require('lspconfig').nixd.setup {},
       ---@type lspconfig.settings.lua_ls
       settings = {
         Lua = {
@@ -554,6 +557,8 @@ do
     'cssls',
     'jsonls',
     'emmet_ls',
+    'clangd',
+    'clang-format',
   })
 
   require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -585,8 +590,9 @@ do
         typescript = true,
         typescriptreact = true,
         css = true,
-        qml = true,
         json = true,
+        c = true,
+        cpp = true,
       }
       if enabled_filetypes[vim.bo[bufnr].filetype] then
         -- pint (and other PHP formatters) boot a full PHP runtime and can take
@@ -603,6 +609,8 @@ do
     formatters_by_ft = {
       python = { 'isort', 'black' },
       php = { 'pint' },
+      sh = { 'shfmt' },
+      bash = { 'shfmt' },
       rust = { 'rustfmt' },
       lua = { 'stylua' },
       blade = { 'blade-formatter' },
@@ -616,13 +624,15 @@ do
       jsonc = { 'prettierd', 'prettier', stop_after_first = true },
       yaml = { 'prettierd', 'prettier', stop_after_first = true },
       markdown = { 'prettierd', 'prettier', stop_after_first = true },
-      qml = { 'qmlformat-qt6' },
-      nix = { 'nixfmt' },
+      c = { 'clang-format' },
+      cpp = { 'clang-format' },
     },
 
     formatters = {
       -- You can also specify extra arguments for formatters here.
-      ['qmlformat-qt6'] = { command = 'qmlformat-qt6', args = { '-i', '$FILENAME' }, stdin = false },
+      shfmt = {
+        prepend_args = { '-i', '2', '-ci' }, -- 2-space indent, switch-case indent
+      },
     },
   }
 
@@ -761,7 +771,6 @@ do
     'tsx',
     'css',
     'json',
-    'jsonc',
     'yaml',
     'python', -- was missing despite Python being a target language
     'go',
